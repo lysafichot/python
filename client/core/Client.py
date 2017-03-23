@@ -2,8 +2,6 @@
 # coding: utf-8
 
 import socket
-import signal
-import sys
 import uuid
 import pickle
 
@@ -19,6 +17,7 @@ class Client:
 
         # Connexion au client
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         try:
             self.socket.connect( (self.ip, self.port) )
@@ -29,14 +28,17 @@ class Client:
             print("[!] Echec de la connexion a %s:%d. Exception is %s" % (self.ip, self.port, e))
             return False
 
-    def sendMessage(self, type, message):
+    def sendMessage(self, type, message=""):
         self.connexion()
 
         try:
-            message = pickle.dumps({"uniqueId": self.uniqueId, "type": type, "message": message})
-            self.socket.send(message)
+            content = {"uniqueId": self.uniqueId, "type": type, "message": message}
+            self.socket.send(pickle.dumps(content))
             recive = self.socket.recv(1024)
-            print("[+] Message du server %s" % (recive))
+
+            if recive == "ok":
+                print("[i] Message bien recu par le sereur %s" % (content))
+                return True
 
         except Exception as e:
             print("[!] Imposible d'envoyer le message a %s:%d. Exception est %s" % (self.ip, self.port, e))
@@ -44,12 +46,11 @@ class Client:
 
         self.socket.close()
 
-def signal_handler(signal, frame):
-    print('[!] Closing connexion')
-    sys.exit(0)
-
-signal.signal(signal.SIGINT, signal_handler)
-
 client = Client("", 15558)
-client.sendMessage("list", "toto")
-client.sendMessage("list", "toto")
+
+sendMessage = client.sendMessage("list")
+
+if sendMessage:
+    print("message ok")
+else:
+    print("message erreur")
