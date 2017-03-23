@@ -34,19 +34,20 @@ class Client:
     def sendMessage(self, commande, message=""):
         self.connexion()
 
+        print(commande)
+
         try:
             content = {"uniqueId": self.uniqueId, "pseudo": self.pseudo, "type": commande, "message": message}
             self.socket.send(pickle.dumps(content))
-            recive = self.socket.recv(1024)
-            recive = pickle.loads(recive)
+            recive = self.socket.recv(999999)
 
             if recive != "ok":
-                return recive
+                return pickle.loads(recive)
             else:
                 return True
 
         except Exception as e:
-            print("[/!\] Imposible d'envoyer le message a %s:%d. Exception est %s" % (self.ip, self.port, e))
+            print("[/!\] Imposible d'envoyer le message a %s:%d. Exception est :%s" % (self.ip, self.port, e))
             return False
 
         self.socket.close()
@@ -54,19 +55,22 @@ class Client:
     def setChannels(self, rooms):
         self.rooms = rooms
 
-    def sendMessageToChannel(self, channel, message):
+    def getUserInRoom(self, room):
 
         if self.rooms == "":
             return false
 
-        # room = self.rooms[channel]
-        # # for (slug, title) in room:
-        # #     print ("ok")
+        return self.rooms[room]
 
+# Master Server
+masterServer = Client("", 15558)
+masterServer.setPseudo("toto")
+rooms = masterServer.sendMessage("rooms")
+masterServer.setChannels(rooms)
+users = masterServer.getUserInRoom("default")
 
-client = Client("", 15558)
-client.setPseudo("toto")
-
-rooms = client.sendMessage("rooms")
-client.setChannels(rooms)
-client.sendMessageToChannel("default", "helo")
+# Clients Server
+for key, user in users.items():
+    tcpsocket = Client(user["ip"], user["port"])
+    tcpsocket.setPseudo("toto")
+    tcpsocket.sendMessage("message", "lol")

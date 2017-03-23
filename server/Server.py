@@ -23,7 +23,7 @@ while True:
     tcpsock.listen(100)
     client, address = tcpsock.accept()
 
-    response = client.recv(1024)
+    response = client.recv(2048)
     if response != "":
         response = pickle.loads(response)
 
@@ -34,16 +34,17 @@ while True:
 
         if uniqueId not in user_list:
             print("[+] User add: %s:%d " % (address[0], address[1]))
-            user_list[uniqueId] = {'ip': address[0], 'port': 1111}
+            count = len(user_list) + 1
+            user_list[count] = {'uniqueId': uniqueId, 'ip': address[0], 'port': 1111}
 
         # Traitements des commandes + reponse
         if intern(commande) is intern("rooms"):
             client.send(pickle.dumps({"default": user_list}))
+            print (user_list)
         else:
             client.send("ok")
 
         # On deconnect le client
         client.close()
-
 
         print("[i] Message bien recu par le sereur %s" % (response))
