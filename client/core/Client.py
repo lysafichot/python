@@ -25,32 +25,48 @@ class Client:
 
         except Exception as e:
             self.socket.close()
-            print("[!] Echec de la connexion a %s:%d. Exception is %s" % (self.ip, self.port, e))
+            print("[/!\] Echec de la connexion a %s:%d. Exception is %s" % (self.ip, self.port, e))
             return False
 
-    def sendMessage(self, type, message=""):
+    def setPseudo(self, pseudo):
+        self.pseudo = pseudo
+
+    def sendMessage(self, commande, message=""):
         self.connexion()
 
         try:
-            content = {"uniqueId": self.uniqueId, "type": type, "message": message}
+            content = {"uniqueId": self.uniqueId, "pseudo": self.pseudo, "type": commande, "message": message}
             self.socket.send(pickle.dumps(content))
             recive = self.socket.recv(1024)
+            recive = pickle.loads(recive)
 
-            if recive == "ok":
-                print("[i] Message bien recu par le sereur %s" % (content))
+            if recive != "ok":
+                return recive
+            else:
                 return True
 
         except Exception as e:
-            print("[!] Imposible d'envoyer le message a %s:%d. Exception est %s" % (self.ip, self.port, e))
+            print("[/!\] Imposible d'envoyer le message a %s:%d. Exception est %s" % (self.ip, self.port, e))
             return False
 
         self.socket.close()
 
+    def setChannels(self, rooms):
+        self.rooms = rooms
+
+    def sendMessageToChannel(self, channel, message):
+
+        if self.rooms == "":
+            return false
+
+        # room = self.rooms[channel]
+        # # for (slug, title) in room:
+        # #     print ("ok")
+
+
 client = Client("", 15558)
+client.setPseudo("toto")
 
-sendMessage = client.sendMessage("list")
-
-if sendMessage:
-    print("message ok")
-else:
-    print("message erreur")
+rooms = client.sendMessage("rooms")
+client.setChannels(rooms)
+client.sendMessageToChannel("default", "helo")
