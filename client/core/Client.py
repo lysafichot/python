@@ -4,6 +4,7 @@
 import socket
 import uuid
 import pickle
+from Tkinter import *
 
 class Client:
 
@@ -30,6 +31,7 @@ class Client:
 
     def setPseudo(self, pseudo):
         self.pseudo = pseudo
+        print(self.pseudo)
 
     def sendMessage(self, commande, message=""):
         self.connexion()
@@ -56,6 +58,5 @@ class Client:
     def getUserInRoom(self, room):
 
         if self.rooms == "":
-            return false
 
-        return self.rooms[room]
+            return self.rooms[room]
