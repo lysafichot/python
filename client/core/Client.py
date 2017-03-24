@@ -60,7 +60,6 @@ class Client:
         self.rooms = rooms
 
     def getUserInRoom(self, room):
-
         if self.rooms == False:
             return False
         elif self.rooms == "":
