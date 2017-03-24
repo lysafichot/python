@@ -4,7 +4,7 @@
 import socket
 import threading
 
-class ClientThread(threading.Thread):
+class Server(threading.Thread):
 
     def __init__(self, ip, port, clientsocket):
 
