@@ -3,6 +3,7 @@
 
 import socket
 import threading
+import pickle
 
 class Server(threading.Thread):
 
@@ -18,16 +19,11 @@ class Server(threading.Thread):
 
         print("[i] Connection de %s %s" % (self.ip, self.port))
 
-        response = self.clientsocket.recv(2048)
+        response = self.clientsocket.recv(999999)
+        response = pickle.loads(response)
+
+        print ("[i] New message de %s:" % (response['pseudo']))
+        print (response['message'])
         self.clientsocket.send("ok")
 
         print("[i] Client déconnecté...")
-
-
-
-# while True:
-#     tcpsock.listen(100)
-#     print( "En écoute...")
-#     (clientsocket, (ip, port)) = tcpsock.accept()
-#     newthread = ClientThread(ip, port, clientsocket)
-#     newthread.start()

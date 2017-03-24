@@ -1,11 +1,24 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import socket
 from core.Client import Client
 from core.Server import Server
 
 speudoIsEmpty = True
+global pseudo
+global users
+
 pseudo = ""
+
+def sendMessage(message):
+
+    if users != False:
+        for key, user in users.items():
+            tcpsocket = Client(user["ip"], user["port"])
+            tcpsocket.setPseudo(pseudo)
+            tcpsocket.sendMessage("message", message)
+
 
 while speudoIsEmpty:
 
@@ -25,10 +38,8 @@ rooms = masterServer.sendMessage("rooms")
 masterServer.setChannels(rooms)
 users = masterServer.getUserInRoom("default")
 
-if users != False:
+while True:
 
-    # Clients Server
-    for key, user in users.items():
-        tcpsocket = Client(user["ip"], user["port"])
-        tcpsocket.setPseudo("toto")
-        tcpsocket.sendMessage("message", "lol")
+    print ("Votre message")
+    message = raw_input()
+    sendMessage(message)
