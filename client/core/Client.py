@@ -21,11 +21,11 @@ class Client:
 
         try:
             self.socket.connect( (self.ip, self.port) )
-            print("[+] Nouveau connexion de %s %s" % (self.ip, self.port))
+            print("[+] Nouveau connexion a %s %s" % (self.ip, self.port))
 
         except Exception as e:
             self.socket.close()
-            print("[/!\] Echec de la connexion a %s:%d. Exception is %s" % (self.ip, self.port, e))
+            print("[/!\] Echec de la connexion a %s:%d. L'exception est : %s" % (self.ip, self.port, e))
             return False
 
     def setPseudo(self, pseudo):
@@ -33,8 +33,6 @@ class Client:
 
     def sendMessage(self, commande, message=""):
         self.connexion()
-
-        print(commande)
 
         try:
             content = {"uniqueId": self.uniqueId, "pseudo": self.pseudo, "type": commande, "message": message}
@@ -47,7 +45,7 @@ class Client:
                 return True
 
         except Exception as e:
-            print("[/!\] Imposible d'envoyer le message a %s:%d. Exception est :%s" % (self.ip, self.port, e))
+            print("[/!\] Imposible d'envoyer le message a %s:%d. Exception est : %s" % (self.ip, self.port, e))
             return False
 
         self.socket.close()
@@ -61,16 +59,3 @@ class Client:
             return false
 
         return self.rooms[room]
-
-# Master Server
-masterServer = Client("", 15558)
-masterServer.setPseudo("toto")
-rooms = masterServer.sendMessage("rooms")
-masterServer.setChannels(rooms)
-users = masterServer.getUserInRoom("default")
-
-# Clients Server
-for key, user in users.items():
-    tcpsocket = Client(user["ip"], user["port"])
-    tcpsocket.setPseudo("toto")
-    tcpsocket.sendMessage("message", "lol")
